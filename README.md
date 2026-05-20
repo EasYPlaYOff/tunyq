@@ -1,35 +1,26 @@
-# tunyq
+Tunyq – доступный ИИ-мониторинг микропластика в грунтовых водах
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+**Трек:** Экология и устойчивое развитие
 
-## Built with v0
+## 1. Проблема (Data-driven)
+**Опасность для здоровья:** Согласно гидрогеологическим исследованиям (включая Иллинойсский университет), микропластик присутствует в 94% анализируемых подземных вод. Исследования Leslie et al. (2022), Jenner et al. (2022) и Campen et al. (2024) выявили микропластик в крови и легких человека. ВОЗ отмечает, что около 3 млрд человек пьют воду без систематического анализа состава.
+**Финансовый барьер:** Профессиональные лабораторные тесты стоят от $1003 за один анализ. По результатам CustDev (N=7), 85% респондентов из-за высокой стоимости никогда не проверяли качество своей воды.
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+2. Решение & Уникальное торговое преимущество (USP)
+Цифровая IoT-платформа для непрерывного мониторинга грунтовых вод. 
+**Аппаратная часть:** Сеть проточных лазерно-оптических датчиков (метод лазерной дифракции частиц).
+**Программная часть:** Аналитический B2B/B2G дашборд с ИИ-моделью компьютерного зрения (Computer Vision). Она в реальном времени определяет форму, размер и концентрацию полимерных частиц без участия лабораторного персонала.
+**Итог:** Автоматический скрининг 24/7 с сокращением затрат на контроль одной точки на **~90%** и выдачей результатов в реальном времени.
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_lfAOZynij4Q69IfZoeMRtK1Afy89)
+3. Бизнес-часть (Рыночный потенциал)
+**TAM:** ~$5,67 млрд (рынок систем мониторинга воды, Grand View Research 2024).
+**SAM:** ~$226 млн для стран СНГ и ЦА (первичный рынок РК – ~$7 млн при 3500 потребителях).
+**SOM:** ~$300 тыс. в год (охват около 150 объектов в Казахстане в первые 2–3 года, 4,3% от SAM).
 
-## Getting Started
+Монетизация:
+1. **SaaS-подписка (B2B/B2G):** $2000 в год за одну точку мониторинга (ПО, аналитика и обслуживание).
+2. **Прямые продажи:** Единовременная продажа аппаратных комплексов с установкой.
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-## Learn More
-
-To learn more, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
-
-<a href="https://v0.app/chat/api/kiro/clone/EasYPlaYOff/tunyq" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+Ссылки 
+**прототип:** https://v0-tunyq.vercel.app
+**репозиторий:** https://github.com/EasyPlaYoff/tunyq
