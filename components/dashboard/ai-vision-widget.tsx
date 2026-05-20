@@ -55,7 +55,11 @@ const generateParticles = (): Particle[] => {
   }))
 }
 
-export function AIVisionWidget() {
+interface AIVisionWidgetProps {
+  fullscreen?: boolean
+}
+
+export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
   const [particles, setParticles] = useState<Particle[]>([])
   const canvasRef = useRef<HTMLDivElement>(null)
 
@@ -89,7 +93,7 @@ export function AIVisionWidget() {
       </div>
 
       {/* Vision container */}
-      <div className="relative flex-1 min-h-[220px] bg-gradient-to-b from-secondary/30 to-card/50">
+      <div className={`relative bg-gradient-to-b from-secondary/30 to-card/50 ${fullscreen ? "flex-1 min-h-[400px]" : "flex-1 min-h-[220px]"}`}>
         {/* Pipe simulation background */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Pipe walls */}

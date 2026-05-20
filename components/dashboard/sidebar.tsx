@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import {
   LayoutDashboard,
   Map,
@@ -17,12 +16,14 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Overview", active: true },
-  { icon: Map, label: "Map", active: false },
-  { icon: Brain, label: "AI Analytics", active: false },
-  { icon: Cpu, label: "Devices", active: false },
-  { icon: FileText, label: "Reports", active: false },
+export type TabId = "overview" | "map" | "ai-analytics" | "devices" | "reports"
+
+const navItems: { icon: typeof LayoutDashboard; label: string; id: TabId }[] = [
+  { icon: LayoutDashboard, label: "Overview", id: "overview" },
+  { icon: Map, label: "Map", id: "map" },
+  { icon: Brain, label: "AI Analytics", id: "ai-analytics" },
+  { icon: Cpu, label: "Devices", id: "devices" },
+  { icon: FileText, label: "Reports", id: "reports" },
 ]
 
 interface DashboardSidebarProps {
@@ -30,6 +31,8 @@ interface DashboardSidebarProps {
   onCollapsedChange: (collapsed: boolean) => void
   mobileOpen: boolean
   onMobileOpenChange: (open: boolean) => void
+  activeTab: TabId
+  onTabChange: (tab: TabId) => void
 }
 
 export function DashboardSidebar({
@@ -37,7 +40,14 @@ export function DashboardSidebar({
   onCollapsedChange,
   mobileOpen,
   onMobileOpenChange,
+  activeTab,
+  onTabChange,
 }: DashboardSidebarProps) {
+  const handleTabClick = (id: TabId) => {
+    onTabChange(id)
+    onMobileOpenChange(false)
+  }
+
   return (
     <>
       {/* Mobile overlay */}
@@ -91,30 +101,34 @@ export function DashboardSidebar({
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1">
-          {navItems.map((item) => (
-            <button
-              key={item.label}
-              className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
-                item.active
-                  ? "bg-primary/15 text-primary glow-neon-green"
-                  : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
-              )}
-            >
-              <item.icon
+          {navItems.map((item) => {
+            const isActive = activeTab === item.id
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleTabClick(item.id)}
                 className={cn(
-                  "w-5 h-5 flex-shrink-0 transition-colors",
-                  item.active && "text-primary"
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
+                  isActive
+                    ? "bg-primary/15 text-primary glow-neon-green"
+                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
                 )}
-              />
-              {!collapsed && (
-                <span className="text-sm font-medium">{item.label}</span>
-              )}
-              {item.active && !collapsed && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary animate-pulse-glow" />
-              )}
-            </button>
-          ))}
+              >
+                <item.icon
+                  className={cn(
+                    "w-5 h-5 flex-shrink-0 transition-colors",
+                    isActive && "text-primary"
+                  )}
+                />
+                {!collapsed && (
+                  <span className="text-sm font-medium">{item.label}</span>
+                )}
+                {isActive && !collapsed && (
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary animate-pulse-glow" />
+                )}
+              </button>
+            )
+          })}
         </nav>
 
         {/* Bottom section */}

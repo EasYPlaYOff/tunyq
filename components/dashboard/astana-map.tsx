@@ -55,7 +55,11 @@ const sensorPins: SensorPin[] = [
   },
 ]
 
-export function AstanaMap() {
+interface AstanaMapProps {
+  fullscreen?: boolean
+}
+
+export function AstanaMap({ fullscreen = false }: AstanaMapProps) {
   const [selectedPin, setSelectedPin] = useState<SensorPin | null>(null)
 
   return (
