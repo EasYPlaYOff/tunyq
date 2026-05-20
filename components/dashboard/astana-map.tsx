@@ -43,7 +43,7 @@ const sensorPins: SensorPin[] = [
     lat: 25,
     lng: 75,
     status: "warning",
-    message: "Minor turbidity detected",
+    message: "Alert: High Microplastic Concentration detected by AI",
   },
   {
     id: "5",
