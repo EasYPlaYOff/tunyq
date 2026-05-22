@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import {
   LineChart,
   Line,
@@ -37,23 +37,11 @@ interface Particle {
   type: string
   confidence: number
   hasDetection: boolean
-  animationDelay: number
+  speed: number
+  opacity: number
 }
 
 const particleTypes = ["PET", "PP", "PE", "PS"]
-
-const generateParticles = (): Particle[] => {
-  return Array.from({ length: 12 }, (_, i) => ({
-    id: i,
-    x: 10 + Math.random() * 80,
-    y: 15 + Math.random() * 70,
-    size: 3 + Math.random() * 4,
-    type: particleTypes[Math.floor(Math.random() * particleTypes.length)],
-    confidence: 92 + Math.floor(Math.random() * 8),
-    hasDetection: i < 3,
-    animationDelay: Math.random() * 3,
-  }))
-}
 
 interface AIVisionWidgetProps {
   fullscreen?: boolean
@@ -61,11 +49,86 @@ interface AIVisionWidgetProps {
 
 export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
   const [particles, setParticles] = useState<Particle[]>([])
-  const canvasRef = useRef<HTMLDivElement>(null)
+  const [detectionCount, setDetectionCount] = useState(0)
+  const animationRef = useRef<number>()
+  const lastTimeRef = useRef<number>(0)
+  const particleIdRef = useRef(0)
 
-  useEffect(() => {
-    setParticles(generateParticles())
+  // Create a new particle at the top
+  const createParticle = useCallback((): Particle => {
+    const hasDetection = Math.random() < 0.25 // 25% chance of detection
+    return {
+      id: particleIdRef.current++,
+      x: 5 + Math.random() * 90,
+      y: -5,
+      size: 3 + Math.random() * 5,
+      type: particleTypes[Math.floor(Math.random() * particleTypes.length)],
+      confidence: 92 + Math.floor(Math.random() * 8),
+      hasDetection,
+      speed: 0.3 + Math.random() * 0.4,
+      opacity: 0.6 + Math.random() * 0.4,
+    }
   }, [])
+
+  // Initialize particles
+  useEffect(() => {
+    const initialParticles: Particle[] = []
+    for (let i = 0; i < 15; i++) {
+      const p = createParticle()
+      p.y = Math.random() * 100 // Spread across the container
+      initialParticles.push(p)
+    }
+    setParticles(initialParticles)
+  }, [createParticle])
+
+  // Animation loop
+  useEffect(() => {
+    const animate = (currentTime: number) => {
+      if (!lastTimeRef.current) lastTimeRef.current = currentTime
+      const deltaTime = currentTime - lastTimeRef.current
+      lastTimeRef.current = currentTime
+
+      setParticles((prevParticles) => {
+        let newDetections = 0
+        const updated = prevParticles
+          .map((particle) => {
+            const newY = particle.y + particle.speed * (deltaTime / 16)
+            
+            // Count new detections when particle crosses middle
+            if (particle.hasDetection && particle.y < 50 && newY >= 50) {
+              newDetections++
+            }
+
+            return {
+              ...particle,
+              y: newY,
+            }
+          })
+          .filter((p) => p.y < 110) // Remove particles that left the container
+
+        // Add new particles periodically
+        if (updated.length < 18 && Math.random() < 0.1) {
+          updated.push(createParticle())
+        }
+
+        if (newDetections > 0) {
+          setDetectionCount((prev) => prev + newDetections)
+        }
+
+        return updated
+      })
+
+      animationRef.current = requestAnimationFrame(animate)
+    }
+
+    animationRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [createParticle])
 
   return (
     <div className="h-full flex flex-col bg-card rounded-xl border border-border overflow-hidden">
@@ -86,14 +149,22 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
             <Zap className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs text-primary font-medium">Processing</span>
+            <span className="text-xs text-primary font-medium">Live Processing</span>
           </div>
         </div>
       </div>
 
       {/* Vision container */}
-      <div className={`relative bg-gradient-to-b from-secondary/30 to-card/50 ${fullscreen ? "flex-1 min-h-[400px]" : "flex-1 min-h-[220px]"}`}>
+      <div
+        className={`relative bg-gradient-to-b from-secondary/30 to-card/50 ${
+          fullscreen ? "flex-1 min-h-[400px]" : "flex-1 min-h-[220px]"
+        }`}
+      >
         {/* Pipe simulation background */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Pipe walls */}
@@ -101,35 +172,27 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
           <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-t from-border/50 to-transparent" />
 
           {/* Water flow effect */}
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              background:
-                "repeating-linear-gradient(90deg, transparent 0%, oklch(0.75 0.15 195 / 0.1) 25%, transparent 50%)",
-              backgroundSize: "200% 100%",
-              animation: "flow 3s linear infinite",
-            }}
-          />
+          <div className="absolute inset-0 opacity-20 water-flow" />
 
-          {/* Particles */}
-          <div ref={canvasRef} className="absolute inset-0">
+          {/* Animated particles */}
+          <div className="absolute inset-0">
             {particles.map((particle) => (
               <div
                 key={particle.id}
-                className="absolute animate-float-particle"
+                className="absolute transition-none"
                 style={{
                   left: `${particle.x}%`,
                   top: `${particle.y}%`,
-                  animationDelay: `${particle.animationDelay}s`,
-                  animationDuration: `${6 + particle.animationDelay}s`,
+                  transform: "translate(-50%, -50%)",
+                  opacity: particle.opacity,
                 }}
               >
                 {/* Particle dot */}
                 <div
-                  className={`rounded-full ${
+                  className={`rounded-full transition-all duration-300 ${
                     particle.hasDetection
-                      ? "bg-primary shadow-[0_0_8px_2px_oklch(0.80_0.25_145/0.5)]"
-                      : "bg-muted-foreground/50"
+                      ? "bg-primary shadow-[0_0_12px_3px_oklch(0.80_0.25_145/0.6)]"
+                      : "bg-muted-foreground/40"
                   }`}
                   style={{
                     width: `${particle.size}px`,
@@ -137,31 +200,27 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
                   }}
                 />
 
-                {/* Detection bounding box */}
+                {/* Detection bounding box - appears with animation */}
                 {particle.hasDetection && (
                   <div
-                    className="absolute border border-primary rounded-sm"
+                    className="absolute border-2 border-primary rounded-sm animate-detection-box"
                     style={{
-                      left: `-${particle.size + 4}px`,
-                      top: `-${particle.size + 4}px`,
-                      width: `${particle.size * 2 + 8}px`,
-                      height: `${particle.size * 2 + 8}px`,
+                      left: `${-particle.size - 6}px`,
+                      top: `${-particle.size - 6}px`,
+                      width: `${particle.size * 2 + 12}px`,
+                      height: `${particle.size * 2 + 12}px`,
                     }}
                   >
                     {/* Corner markers */}
-                    <div className="absolute -top-px -left-px w-2 h-2 border-t-2 border-l-2 border-primary" />
-                    <div className="absolute -top-px -right-px w-2 h-2 border-t-2 border-r-2 border-primary" />
-                    <div className="absolute -bottom-px -left-px w-2 h-2 border-b-2 border-l-2 border-primary" />
-                    <div className="absolute -bottom-px -right-px w-2 h-2 border-b-2 border-r-2 border-primary" />
+                    <div className="absolute -top-px -left-px w-2.5 h-2.5 border-t-2 border-l-2 border-primary" />
+                    <div className="absolute -top-px -right-px w-2.5 h-2.5 border-t-2 border-r-2 border-primary" />
+                    <div className="absolute -bottom-px -left-px w-2.5 h-2.5 border-b-2 border-l-2 border-primary" />
+                    <div className="absolute -bottom-px -right-px w-2.5 h-2.5 border-b-2 border-r-2 border-primary" />
 
                     {/* Label */}
-                    <div
-                      className="absolute -top-6 left-0 whitespace-nowrap px-1.5 py-0.5 rounded bg-primary/90 text-primary-foreground text-[9px] font-mono"
-                      style={{ transform: "translateY(-2px)" }}
-                    >
+                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded bg-primary/95 text-primary-foreground text-[9px] font-mono shadow-lg">
                       [Microplastic: {particle.type} | Size:{" "}
-                      {Math.round(particle.size)}µm | Conf: {particle.confidence}
-                      %]
+                      {Math.round(particle.size)}µm | Conf: {particle.confidence}%]
                     </div>
                   </div>
                 )}
@@ -170,26 +229,24 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
           </div>
 
           {/* Scan line effect */}
-          <div
-            className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-60"
-            style={{
-              animation: "scan 2s ease-in-out infinite",
-              top: "50%",
-            }}
-          />
+          <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-accent to-transparent opacity-60 scan-line" />
         </div>
 
         {/* Overlay stats */}
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
           <div className="px-2 py-1 rounded bg-card/80 backdrop-blur-sm border border-border">
             <span className="text-[10px] font-mono text-muted-foreground">
-              DETECTION RATE:{" "}
-              <span className="text-primary font-semibold">12.4/min</span>
+              DETECTED:{" "}
+              <span className="text-primary font-semibold tabular-nums">
+                {detectionCount}
+              </span>{" "}
+              particles
             </span>
           </div>
           <div className="px-2 py-1 rounded bg-card/80 backdrop-blur-sm border border-border">
             <span className="text-[10px] font-mono text-muted-foreground">
-              MODEL: <span className="text-accent font-semibold">YOLOv8-nano</span>
+              MODEL:{" "}
+              <span className="text-accent font-semibold">YOLOv8-nano</span>
             </span>
           </div>
         </div>
@@ -256,23 +313,53 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
       </div>
 
       <style jsx>{`
-        @keyframes flow {
+        .water-flow {
+          background: repeating-linear-gradient(
+            180deg,
+            transparent 0%,
+            oklch(0.75 0.15 195 / 0.08) 25%,
+            transparent 50%
+          );
+          background-size: 100% 40px;
+          animation: water-flow 1.5s linear infinite;
+        }
+
+        @keyframes water-flow {
           0% {
-            background-position: 200% 0;
+            background-position: 0 -40px;
           }
           100% {
             background-position: 0 0;
           }
         }
+
+        .scan-line {
+          animation: scan 2.5s ease-in-out infinite;
+        }
+
         @keyframes scan {
           0%,
           100% {
-            top: 10%;
+            top: 5%;
             opacity: 0.3;
           }
           50% {
-            top: 90%;
+            top: 95%;
             opacity: 0.8;
+          }
+        }
+
+        .animate-detection-box {
+          animation: detection-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes detection-pulse {
+          0%,
+          100% {
+            box-shadow: 0 0 4px 1px oklch(0.80 0.25 145 / 0.4);
+          }
+          50% {
+            box-shadow: 0 0 12px 3px oklch(0.80 0.25 145 / 0.7);
           }
         }
       `}</style>

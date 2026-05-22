@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { MapPin, X, AlertTriangle } from "lucide-react"
 
 interface SensorPin {
@@ -12,7 +12,7 @@ interface SensorPin {
   message?: string
 }
 
-const sensorPins: SensorPin[] = [
+const defaultSensorPins: SensorPin[] = [
   {
     id: "1",
     name: "Sensor #07",
@@ -57,10 +57,32 @@ const sensorPins: SensorPin[] = [
 
 interface AstanaMapProps {
   fullscreen?: boolean
+  simulatedAlertSensorId?: string | null
 }
 
-export function AstanaMap({ fullscreen = false }: AstanaMapProps) {
+export function AstanaMap({ fullscreen = false, simulatedAlertSensorId }: AstanaMapProps) {
   const [selectedPin, setSelectedPin] = useState<SensorPin | null>(null)
+  const [sensorPins, setSensorPins] = useState<SensorPin[]>(defaultSensorPins)
+
+  // Handle simulated alert
+  useEffect(() => {
+    if (simulatedAlertSensorId) {
+      setSensorPins(pins => 
+        pins.map(pin => 
+          pin.id === simulatedAlertSensorId
+            ? {
+                ...pin,
+                status: "alert" as const,
+                message: "CRITICAL: High PET Microplastic Concentration detected by AI!",
+              }
+            : pin
+        )
+      )
+    } else {
+      // Reset to default
+      setSensorPins(defaultSensorPins)
+    }
+  }, [simulatedAlertSensorId])
 
   return (
     <div className="relative h-full bg-card rounded-xl border border-border overflow-hidden">
@@ -260,7 +282,7 @@ export function AstanaMap({ fullscreen = false }: AstanaMapProps) {
         {/* Selected pin popup */}
         {selectedPin && (
           <div
-            className="absolute z-30 w-64 bg-card/95 backdrop-blur-md rounded-lg border border-border shadow-xl"
+            className="absolute z-30 w-64 bg-card/95 backdrop-blur-md rounded-lg border border-border shadow-xl animate-fade-in"
             style={{
               left: `${Math.min(Math.max(selectedPin.lng, 20), 80)}%`,
               top: `${Math.min(Math.max(selectedPin.lat + 8, 20), 70)}%`,
