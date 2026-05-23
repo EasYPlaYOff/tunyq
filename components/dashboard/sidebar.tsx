@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import {
   LayoutDashboard,
   Map,
@@ -15,6 +14,7 @@ import {
   X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { TunyqLogo } from "./tunyq-logo"
 
 export type TabId = "overview" | "map" | "ai-analytics" | "devices" | "reports"
 
@@ -87,14 +87,7 @@ export function DashboardSidebar({
           "flex items-center border-b border-sidebar-border transition-all duration-300",
           collapsed ? "justify-center px-2 py-4" : "justify-start px-4 py-4"
         )}>
-          <Image
-            src="/images/tunyq-logo.png"
-            alt="Tunyq Logo"
-            width={collapsed ? 40 : 140}
-            height={collapsed ? 40 : 50}
-            className="object-contain transition-all duration-300"
-            priority
-          />
+          <TunyqLogo collapsed={collapsed} />
         </div>
 
         {/* Navigation */}
@@ -108,7 +101,7 @@ export function DashboardSidebar({
                 className={cn(
                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
                   isActive
-                    ? "bg-primary/15 text-primary glow-neon-green"
+                    ? "bg-primary/15 text-primary glow-neon-yellow"
                     : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
                 )}
               >

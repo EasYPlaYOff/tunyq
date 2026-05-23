@@ -136,8 +136,8 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
       <div className="px-4 py-3 border-b border-border bg-card/90">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center glow-neon-cyan">
-              <Eye className="w-4 h-4 text-accent" />
+            <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center glow-neon-yellow">
+              <Eye className="w-4 h-4 text-primary" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-foreground">
@@ -191,7 +191,7 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
                 <div
                   className={`rounded-full transition-all duration-300 ${
                     particle.hasDetection
-                      ? "bg-primary shadow-[0_0_12px_3px_oklch(0.80_0.25_145/0.6)]"
+                      ? "bg-primary shadow-[0_0_12px_3px_oklch(0.85_0.18_85/0.6)]"
                       : "bg-muted-foreground/40"
                   }`}
                   style={{
@@ -229,7 +229,7 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
           </div>
 
           {/* Scan line effect */}
-          <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-accent to-transparent opacity-60 scan-line" />
+          <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-60 scan-line" />
         </div>
 
         {/* Overlay stats */}
@@ -246,7 +246,7 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
           <div className="px-2 py-1 rounded bg-card/80 backdrop-blur-sm border border-border">
             <span className="text-[10px] font-mono text-muted-foreground">
               MODEL:{" "}
-              <span className="text-accent font-semibold">YOLOv8-nano</span>
+              <span className="text-primary font-semibold">YOLOv8-nano</span>
             </span>
           </div>
         </div>
@@ -268,42 +268,42 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
             <LineChart data={chartData}>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="oklch(0.25 0.03 250)"
+                stroke="oklch(0.28 0.015 260)"
                 vertical={false}
               />
               <XAxis
                 dataKey="hour"
-                tick={{ fontSize: 9, fill: "oklch(0.65 0.02 250)" }}
-                axisLine={{ stroke: "oklch(0.25 0.03 250)" }}
+                tick={{ fontSize: 9, fill: "oklch(0.65 0.01 90)" }}
+                axisLine={{ stroke: "oklch(0.28 0.015 260)" }}
                 tickLine={false}
                 interval={5}
               />
               <YAxis
-                tick={{ fontSize: 9, fill: "oklch(0.65 0.02 250)" }}
+                tick={{ fontSize: 9, fill: "oklch(0.65 0.01 90)" }}
                 axisLine={false}
                 tickLine={false}
                 width={30}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "oklch(0.15 0.025 250)",
-                  border: "1px solid oklch(0.25 0.03 250)",
+                  backgroundColor: "oklch(0.16 0.012 260)",
+                  border: "1px solid oklch(0.28 0.015 260)",
                   borderRadius: "8px",
                   fontSize: "11px",
                 }}
-                labelStyle={{ color: "oklch(0.95 0.01 250)" }}
-                itemStyle={{ color: "oklch(0.80 0.25 145)" }}
+                labelStyle={{ color: "oklch(0.95 0.01 90)" }}
+                itemStyle={{ color: "oklch(0.85 0.18 85)" }}
               />
               <Line
                 type="monotone"
                 dataKey="particles"
-                stroke="oklch(0.80 0.25 145)"
+                stroke="oklch(0.85 0.18 85)"
                 strokeWidth={2}
                 dot={false}
                 activeDot={{
                   r: 4,
-                  fill: "oklch(0.80 0.25 145)",
-                  stroke: "oklch(0.12 0.02 250)",
+                  fill: "oklch(0.85 0.18 85)",
+                  stroke: "oklch(0.13 0.01 260)",
                   strokeWidth: 2,
                 }}
               />
@@ -317,7 +317,7 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
           background: repeating-linear-gradient(
             180deg,
             transparent 0%,
-            oklch(0.75 0.15 195 / 0.08) 25%,
+            oklch(0.85 0.18 85 / 0.08) 25%,
             transparent 50%
           );
           background-size: 100% 40px;
@@ -356,10 +356,10 @@ export function AIVisionWidget({ fullscreen = false }: AIVisionWidgetProps) {
         @keyframes detection-pulse {
           0%,
           100% {
-            box-shadow: 0 0 4px 1px oklch(0.80 0.25 145 / 0.4);
+            box-shadow: 0 0 4px 1px oklch(0.85 0.18 85 / 0.4);
           }
           50% {
-            box-shadow: 0 0 12px 3px oklch(0.80 0.25 145 / 0.7);
+            box-shadow: 0 0 12px 3px oklch(0.85 0.18 85 / 0.7);
           }
         }
       `}</style>
