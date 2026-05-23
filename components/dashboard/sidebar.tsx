@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import {
   LayoutDashboard,
   Map,
@@ -10,7 +11,6 @@ import {
   Bell,
   ChevronLeft,
   ChevronRight,
-  Droplets,
   Menu,
   X,
 } from "lucide-react"
@@ -83,20 +83,18 @@ export function DashboardSidebar({
         </button>
 
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 py-5 border-b border-sidebar-border">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/20 glow-neon-green">
-            <Droplets className="w-6 h-6 text-primary" />
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col">
-              <span className="text-lg font-bold text-foreground tracking-tight">
-                Tunyq
-              </span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
-                Water Intelligence
-              </span>
-            </div>
-          )}
+        <div className={cn(
+          "flex items-center border-b border-sidebar-border transition-all duration-300",
+          collapsed ? "justify-center px-2 py-4" : "justify-start px-4 py-4"
+        )}>
+          <Image
+            src="/images/tunyq-logo.png"
+            alt="Tunyq Logo"
+            width={collapsed ? 40 : 140}
+            height={collapsed ? 40 : 50}
+            className="object-contain transition-all duration-300"
+            priority
+          />
         </div>
 
         {/* Navigation */}
